@@ -3,8 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-// const baseurl = "https://dinizadientapitest.azurewebsites.net/informativa/";
-const baseurl = "http://10.141.24.80:5011/api/InformativaAPI/";
+const baseurl = "[YOUR DOMAIN HERE]/api/InformativaAPI/";
 
 class Api {
   static Future<http.Response> getAllCategories(int selectedId) async {
