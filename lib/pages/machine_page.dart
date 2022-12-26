@@ -1,14 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-import 'dart:async';
-import 'package:flutter/services.dart' show ByteData, rootBundle;
-import 'package:intl/intl.dart';
+import 'package:informativa/pages/date_selector.dart';
 import 'dart:convert';
-import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
-import 'package:informativa/models/excel_detail.dart';
-import 'package:informativa/models/excel_master.dart';
 import 'package:informativa/pages/main_page.dart';
 import 'package:informativa/models/globals.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../api.dart';
 import '../models/machine.dart';
 
@@ -38,67 +34,10 @@ class _MachinePageState extends State<MachinePage> {
     );
   }
 
-  List<ExcelDetail> excelDetail = [];
-  getExcelDetail() {
-    Api.getExcelDetail().then(
-      (response) {
-        setState(
-          () {
-            Iterable list = json.decode(response.body);
-            excelDetail =
-                list.map((model) => ExcelDetail.fromJson(model)).toList();
-          },
-        );
-      },
-    );
-  }
-
-  List<ExcelMaster> excelMaster = [];
-  getExcelMaster() {
-    Api.getExcelMaster().then(
-      (response) {
-        setState(
-          () {
-            Iterable list = json.decode(response.body);
-            excelMaster =
-                list.map((model) => ExcelMaster.fromJson(model)).toList();
-          },
-        );
-      },
-    );
-  }
-
-  Future<void> exportToExcel() async {
-    ByteData data = await rootBundle.load("Informativa_Report.xlsx");
-    var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    var excel = Excel.decodeBytes(bytes);
-    Sheet sheetObject = excel["Sheet1"];
-
-    for (var column = 0; column < excelDetail.length; column++) {
-      var cellA = sheetObject.cell(CellIndex.indexByString("A${column + 2}"));
-      cellA.value = excelDetail[column].machineName;
-      var cellB = sheetObject.cell(CellIndex.indexByString("B${column + 2}"));
-      cellB.value = excelDetail[column].checkerName;
-      var cellC = sheetObject.cell(CellIndex.indexByString("C${column + 2}"));
-      cellC.value = excelDetail[column].description;
-      var cellD = sheetObject.cell(CellIndex.indexByString("D${column + 2}"));
-      cellD.value = DateFormat("dd-MM-yyyy").format(excelDetail[column].date);
-      var cellE = sheetObject.cell(CellIndex.indexByString("E${column + 2}"));
-      cellE.value = excelDetail[column].controlName;
-      var cellF = sheetObject.cell(CellIndex.indexByString("F${column + 2}"));
-      cellF.value = excelDetail[column].checked;
-
-      cellF.value ? cellF.value = "İşaretlendi" : cellF.value = "İşaretlenmedi";
-    }
-
-    excel.save(fileName: "Informativa_Report-${DateTime.now()}.xlsx");
-  }
-
   @override
   void initState() {
     getMachines();
-    getExcelDetail();
-    getExcelMaster();
+    categoryId = 0;
     super.initState();
   }
 
@@ -128,6 +67,7 @@ class _MachinePageState extends State<MachinePage> {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Color.fromRGBO(84, 114, 251, 1),
       appBar: AppBar(
@@ -135,8 +75,9 @@ class _MachinePageState extends State<MachinePage> {
         backgroundColor: const Color.fromRGBO(84, 114, 251, 1),
         title: Center(
           child: Image.asset(
-            "assets/image/informativa-logo-large.png",
+            "informativa-logo-large.png",
             width: screenWidth * 0.4,
+            height: screenHeight * 0.04,
           ),
         ),
       ),
@@ -145,17 +86,33 @@ class _MachinePageState extends State<MachinePage> {
             color: Colors.white,
             borderRadius: BorderRadius.only(topRight: Radius.circular(50))),
         child: Padding(
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.all(8.0),
           child: Column(
             children: [
-              Expanded(
-                flex: 10,
+              Padding(
+                padding: const EdgeInsets.only(
+                    left: 16.0, right: 16, top: 8, bottom: 8),
                 child: TextField(
                   controller: machineName,
                   cursorColor: Color.fromRGBO(24, 29, 61, 1),
                   onChanged: (value) => _runFilter(value),
                   decoration: InputDecoration(
+                    prefixIcon: const Icon(
+                      Icons.build_circle_outlined,
+                      color: Color.fromRGBO(25, 25, 25, 1),
+                      size: 20,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                            color: Color.fromRGBO(25, 25, 25, 0.4))),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                            color: Color.fromRGBO(25, 25, 25, 0.4))),
                     labelText: "Makine İsmi Girin",
+                    labelStyle:
+                        const TextStyle(color: Color.fromRGBO(25, 25, 25, 1)),
                     suffixIcon: IconButton(
                       onPressed: () {
                         machineName.clear();
@@ -164,8 +121,8 @@ class _MachinePageState extends State<MachinePage> {
                         });
                       },
                       icon: Icon(
-                        Icons.clear_rounded,
-                        color: Colors.blue,
+                        Icons.delete_forever_outlined,
+                        color: Color.fromRGBO(217, 20, 55, 0.8),
                       ),
                     ),
                   ),
@@ -181,6 +138,7 @@ class _MachinePageState extends State<MachinePage> {
                   shrinkWrap: true,
                   itemCount: _foundMachines.length,
                   itemBuilder: ((context, index) => Card(
+                        //key: ValueKey(_foundMachines),
                         color: Colors.white,
                         elevation: 0,
                         margin: const EdgeInsets.symmetric(vertical: 1),
@@ -192,7 +150,6 @@ class _MachinePageState extends State<MachinePage> {
                               setState(
                                 () {
                                   machineId = _foundMachines[index].machineId;
-
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -225,17 +182,25 @@ class _MachinePageState extends State<MachinePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.file_download_outlined,
-          size: 30,
+        backgroundColor: Color.fromRGBO(16, 114, 60, 1),
+        child: Image.asset(
+          "excel_white.png",
+          height: 25,
+          width: 25,
         ),
         onPressed: () {
           setState(() {
-            getMachines();
-            getExcelDetail();
-            getExcelMaster();
+            showBarModalBottomSheet(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(20))),
+              context: context,
+              builder: (context) {
+                return DatePicker();
+              },
+            );
           });
-          exportToExcel();
         },
       ),
     );

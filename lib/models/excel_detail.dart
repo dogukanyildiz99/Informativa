@@ -13,58 +13,66 @@ class ExcelDetail {
   ExcelDetail({
     required this.ruleId,
     required this.checked,
-    required this.checkListMasterId,
-    required this.controlId,
     required this.controlName,
     required this.categoryId,
+    required this.controlId,
+    required this.checkListMasterId,
+    required this.checkListDetailId,
     required this.checkerName,
-    required this.date,
     required this.machineId,
+    required this.date,
+    required this.description,
     required this.machineName,
     required this.categoryName,
-    required this.description,
+    required this.checkDuration,
   });
 
   int ruleId;
   bool checked;
-  int checkListMasterId;
-  int controlId;
   String controlName;
   int categoryId;
+  int controlId;
+  int checkListMasterId;
+  int checkListDetailId;
   String checkerName;
-  DateTime date;
   int machineId;
+  DateTime date;
+  String description;
   String machineName;
   String categoryName;
-  String description;
+  String checkDuration;
 
   factory ExcelDetail.fromJson(Map<String, dynamic> json) => ExcelDetail(
         ruleId: json["ruleId"],
         checked: json["checked"],
-        checkListMasterId: json["checkListMasterId"],
-        controlId: json["controlId"],
         controlName: json["controlName"],
         categoryId: json["categoryId"],
+        controlId: json["controlId"],
+        checkListMasterId: json["checkListMasterId"],
+        checkListDetailId: json["checkListDetailId"],
         checkerName: json["checkerName"],
-        date: DateTime.parse(json["date"]),
         machineId: json["machineId"],
+        date: DateTime.parse(json["date"]),
+        description: json["description"],
         machineName: json["machineName"],
         categoryName: json["categoryName"],
-        description: json["description"],
+        checkDuration: json["checkDuration"],
       );
 
   Map<String, dynamic> toJson() => {
         "ruleId": ruleId,
         "checked": checked,
-        "checkListMasterId": checkListMasterId,
-        "controlId": controlId,
         "controlName": controlName,
         "categoryId": categoryId,
+        "controlId": controlId,
+        "checkListMasterId": checkListMasterId,
+        "checkListDetailId": checkListDetailId,
         "checkerName": checkerName,
-        "date": date.toIso8601String(),
         "machineId": machineId,
+        "date": date.toIso8601String(),
+        "description": description,
         "machineName": machineName,
         "categoryName": categoryName,
-        "description": description,
+        "checkDuration": checkDuration,
       };
 }

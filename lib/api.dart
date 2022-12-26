@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
+// const baseurl = "https://dinizadientapitest.azurewebsites.net/informativa/";
 const baseurl = "http://10.141.24.80:5011/api/InformativaAPI/";
 
 class Api {
@@ -46,20 +48,22 @@ class Api {
   static Future<http.Response> logData(
       String addInfo,
       String addName,
-      String addRegName,
+      String addRegNum,
       int selectedMachineID,
       int selectedId,
       int rulesId,
-      bool checked) {
+      bool checked,
+      String addCheckDuration) {
     var url = "${baseurl}logData";
     String body = json.encode({
       'CheckerName': addName,
       'Description': addInfo,
-      'CheckerRegNum': addRegName,
+      'CheckerRegNum': addRegNum,
       'MachineId': selectedId,
       'CategoryId': selectedMachineID,
       'RuleId': rulesId,
       'Checked': checked,
+      'CheckDuration': addCheckDuration,
     });
 
     return http.post(Uri.parse(url),
@@ -86,15 +90,25 @@ class Api {
         .get(Uri.parse(url), headers: {"Accept": "application/json"});
   }
 
-  static Future<http.Response> getExcelDetail() async {
+  static Future<http.Response> getExcelDetail(
+      DateTime startDate, DateTime endDate) async {
+    String a = DateFormat("yyyy-MM-ddT00:00:00").format(startDate);
+    String b = DateFormat("yyyy-MM-ddT23:59:59").format(endDate);
     var url = "${baseurl}getExcelDetail";
-    return await http
-        .get(Uri.parse(url), headers: {"Accept": "application/json"});
+    String body = json.encode({'StartDate': a, 'EndDate': b});
+
+    return http.post(Uri.parse(url),
+        headers: {"Content-Type": "application/json"}, body: body);
   }
 
-  static Future<http.Response> getExcelMaster() async {
+  static Future<http.Response> getExcelMaster(
+      DateTime startDate, DateTime endDate) async {
+    String a = DateFormat("yyyy-MM-ddT00:00:00").format(startDate);
+    String b = DateFormat("yyyy-MM-ddT23:59:59").format(endDate);
     var url = "${baseurl}getExcelMaster";
-    return await http
-        .get(Uri.parse(url), headers: {"Accept": "application/json"});
+    String body = json.encode({'StartDate': a, 'EndDate': b});
+
+    return http.post(Uri.parse(url),
+        headers: {"Content-Type": "application/json"}, body: body);
   }
 }

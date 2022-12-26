@@ -1,6 +1,5 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, must_be_immutable
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, must_be_immutable, unused_element
 import 'dart:convert';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter/material.dart';
 import 'package:informativa/models/check_master.dart';
 import 'package:informativa/models/globals.dart';
@@ -19,6 +18,7 @@ class OldRecords extends StatefulWidget {
 }
 
 class _OldRecordsState extends State<OldRecords> {
+  int a = 0;
   List<CheckMaster> master = [];
 
   getChecks() {
@@ -37,7 +37,6 @@ class _OldRecordsState extends State<OldRecords> {
   @override
   void initState() {
     getChecks();
-
     super.initState();
   }
 
@@ -47,14 +46,16 @@ class _OldRecordsState extends State<OldRecords> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: const Color.fromRGBO(84, 114, 251, 1),
-        title: Text("Eski Kayıtlar"),
+        title: widget.selectedId == 32
+            ? Text("Diğer Hata Kayıtları")
+            : Text("Hata Kayıtları"),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: Colors.white,
           ),
           onPressed: () {
-            setState(() {
+            setState(() async {
               categoryId = 0;
               Navigator.pushAndRemoveUntil(
                   context,
@@ -64,71 +65,59 @@ class _OldRecordsState extends State<OldRecords> {
           },
         ),
       ),
-      body: AnimationLimiter(
-        child: ListView.builder(
-          itemCount: master.length,
-          itemBuilder: (BuildContext context, int index) {
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              duration: const Duration(seconds: 5000),
-              child: SlideAnimation(
-                verticalOffset: 50.0,
-                child: FadeInAnimation(
-                  curve: Curves.easeIn,
-                  child: Card(
-                    child: ListTile(
-                      title: Text(master[index].description),
-                      subtitle: Row(
-                        children: [
-                          Text(master[index].checkerName),
-                          SizedBox(
-                            width: 1,
-                          ),
-                          Icon(
-                            Icons.arrow_right_rounded,
-                            size: 20,
-                          ),
-                          SizedBox(
-                            width: 1,
-                          ),
-                          Text(master[index].checkerRegNum),
-                          SizedBox(
-                            width: 3,
-                          ),
-                          Icon(
-                            Icons.arrow_right_rounded,
-                            size: 20,
-                          ),
-                          SizedBox(
-                            width: 1,
-                          ),
-                          Text(DateFormat("dd-MM-yyyy")
-                              .format(master[index].date))
-                        ],
-                      ),
-                      onTap: () {
-                        setState(() {
-                          masterId = master[index].checkListMasterId;
-                        });
-
-                        showBarModalBottomSheet(
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(20))),
-                          context: context,
-                          builder: (context) {
-                            return Scroll();
-                          },
-                        );
-                      },
-                    ),
+      body: ListView.builder(
+        itemCount: master.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            child: ListTile(
+              title: Text(master[index].description),
+              subtitle: Row(
+                children: [
+                  Text(master[index].checkerName),
+                  SizedBox(
+                    width: 1,
                   ),
-                ),
+                  Icon(
+                    Icons.arrow_right_rounded,
+                    size: 20,
+                  ),
+                  SizedBox(
+                    width: 1,
+                  ),
+                  Text(master[index].checkerRegNum),
+                  SizedBox(
+                    width: 3,
+                  ),
+                  Icon(
+                    Icons.arrow_right_rounded,
+                    size: 20,
+                  ),
+                  SizedBox(
+                    width: 1,
+                  ),
+                  Text(DateFormat("dd-MM-yyyy").format(master[index].date))
+                ],
               ),
-            );
-          },
-        ),
+              onTap: () {
+                setState(() {
+                  masterId = master[index].checkListMasterId;
+                });
+                if (widget.selectedId != 32) {
+                  showBarModalBottomSheet(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20))),
+                    context: context,
+                    builder: (context) {
+                      return Scroll();
+                    },
+                  );
+                }
+              },
+            ),
+          );
+        },
       ),
     );
   }

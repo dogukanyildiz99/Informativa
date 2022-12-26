@@ -1,6 +1,6 @@
 {
-    "name": "informativa",
-    "short_name": "informativa",
+    "name": "Informativa",
+    "short_name": "Informativa",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

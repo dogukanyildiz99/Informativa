@@ -1,5 +1,4 @@
 // ignore_for_file: prefer_const_constructors, must_be_immutable, prefer_typing_uninitialized_variables, prefer_const_literals_to_create_immutables
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:informativa/models/category.dart';
@@ -7,6 +6,7 @@ import 'package:informativa/models/globals.dart';
 import 'package:informativa/pages/second_page.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 import '../api.dart';
+import 'add_record.dart';
 
 class MainPage extends StatefulWidget {
   MainPage(this.selectedMachineId, this.selectedId, {super.key});
@@ -97,13 +97,14 @@ class _MainPageState extends State<MainPage> {
             ),
           ),
         ]),
-        leading: categoryId == 0
+        leading: categoryId == 0 || categoryId == 32
             ? IconButton(
                 icon: Icon(
                   Icons.arrow_back_ios_new_rounded,
                   color: Colors.white,
                 ),
                 onPressed: () {
+                  categoryId = 0;
                   Navigator.pop(context);
                 },
               )
@@ -178,12 +179,30 @@ class _MainPageState extends State<MainPage> {
                       onTap: () {
                         setState(
                           () {
-                            selectedMachineID = widget.selectedMachineId;
                             categoryId = items[index].categoryId;
-                            back.add(items[index].parentCategoryId);
-                            selectedParentName = items[index].categoryName;
-                            nameList.add(items[index].categoryName);
-                            getCategories();
+                            if (categoryId == 32) {
+                              showModalBottomSheet(
+                                isScrollControlled: true,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20),
+                                  ),
+                                ),
+                                context: context,
+                                builder: (context) {
+                                  return AddRecordBottomSheet(
+                                      widget.selectedMachineId,
+                                      items[index].categoryId);
+                                },
+                              );
+                            } else {
+                              selectedMachineID = widget.selectedMachineId;
+                              categoryId = items[index].categoryId;
+                              back.add(items[index].parentCategoryId);
+                              nameList.add(items[index].categoryName);
+                              selectedParentName = items[index].categoryName;
+                              getCategories();
+                            }
                           },
                         );
                       },

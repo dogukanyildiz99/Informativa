@@ -1,11 +1,11 @@
-// ignore_for_file: must_be_immutable, prefer_const_constructors, sort_child_properties_last, unused_local_variable, curly_braces_in_flow_control_structures
+// ignore_for_file: must_be_immutable, prefer_const_constructors, sort_child_properties_last, unused_local_variable, curly_braces_in_flow_control_structures, use_build_context_synchronously
 import 'dart:convert';
 import 'package:informativa/models/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:informativa/pages/add_record.dart';
 import 'package:informativa/pages/old_records.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../api.dart';
 import '../models/machine_rule.dart';
 
@@ -23,14 +23,11 @@ class _SecondPageState extends State<SecondPage> {
   String addName = "";
   String addInfo = "";
   String addRegNum = "";
+  String addCheckDuration = "";
+
   List<MachineRule> errors = [];
   bool firstRun = true;
   int count = 0;
-
-  var userName = TextEditingController();
-  var infoName = TextEditingController();
-  var regNum = TextEditingController();
-
   getRules() {
     Api.getAllMachineRules(
       categoryId,
@@ -69,19 +66,26 @@ class _SecondPageState extends State<SecondPage> {
     });
   }
 
+  var userName = TextEditingController();
+  var infoName = TextEditingController();
+  var regNum = TextEditingController();
+  var checkDuration = TextEditingController();
+
   addLog() {
-    Api.logData(
-      addInfo,
-      addName,
-      addRegNum,
-      categoryId,
-      widget.selectedMachineID,
-      rulesId,
-      checked,
-    ).then((response) {
+    Api.logData(addInfo, addName, addRegNum, categoryId,
+            widget.selectedMachineID, rulesId, checked, addCheckDuration)
+        .then((response) {
       if (response.body == "success") {
-        setState(() {});
-      } else {}
+        setState(() {
+          resetCheck();
+        });
+      }
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                OldRecords(widget.selectedMachineID, categoryId)),
+      );
     });
   }
 
@@ -140,29 +144,27 @@ class _SecondPageState extends State<SecondPage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: const Color.fromRGBO(84, 114, 251, 1),
-        title: Column(
-          children: [
-            BreadCrumb(
-              items: <BreadCrumbItem>[
-                BreadCrumbItem(
-                  content: Text(
-                    widget.selectedName,
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500),
-                  ),
+        title: Column(children: [
+          BreadCrumb(
+            items: <BreadCrumbItem>[
+              BreadCrumbItem(
+                content: Text(
+                  widget.selectedName,
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500),
                 ),
-              ],
-              divider: const Icon(Icons.chevron_right),
-              overflow: ScrollableOverflow(
-                reverse: false,
-                direction: Axis.horizontal,
-                keepLastDivider: false,
               ),
+            ],
+            divider: const Icon(Icons.chevron_right),
+            overflow: ScrollableOverflow(
+              reverse: false,
+              direction: Axis.horizontal,
+              keepLastDivider: false,
             ),
-          ],
-        ),
+          ),
+        ]),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
@@ -253,157 +255,18 @@ class _SecondPageState extends State<SecondPage> {
                       padding: EdgeInsets.only(left: 10, right: 10),
                       child: ElevatedButton(
                         child: Text('Kayıt Oluştur'),
-                        onPressed: () => showBarModalBottomSheet(
-                          context: context,
+                        onPressed: () => showModalBottomSheet(
+                          isScrollControlled: true,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.vertical(
                               top: Radius.circular(20),
                             ),
                           ),
-                          builder: (context) => DraggableScrollableSheet(
-                            initialChildSize: 0.6,
-                            maxChildSize: 0.95,
-                            minChildSize: 0.4,
-                            expand: false,
-                            snap: false,
-                            builder: (context, scrollController) {
-                              return Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: ListView(
-                                  controller: scrollController,
-                                  children: [
-                                    Expanded(
-                                      flex: 40,
-                                      child: Container(
-                                        color: Colors.transparent,
-                                        child: TextFormField(
-                                          controller: userName,
-                                          decoration: InputDecoration(
-                                            labelText: "Adınızı Girin",
-                                            suffixIcon: IconButton(
-                                              onPressed: () {
-                                                userName.clear();
-                                              },
-                                              icon: Icon(
-                                                Icons.clear_rounded,
-                                                color: Color.fromRGBO(
-                                                    84, 114, 251, 1),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 40,
-                                      child: Container(
-                                        color: Colors.transparent,
-                                        child: TextFormField(
-                                          controller: regNum,
-                                          decoration: InputDecoration(
-                                            labelText: "Sicil Numarası Girin",
-                                            suffixIcon: IconButton(
-                                              onPressed: () {
-                                                regNum.clear();
-                                              },
-                                              icon: Icon(
-                                                Icons.clear_rounded,
-                                                color: Color.fromRGBO(
-                                                    84, 114, 251, 1),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 5,
-                                      child: Container(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 60,
-                                      child: Container(
-                                        color: Colors.transparent,
-                                        child: TextFormField(
-                                          maxLines: 5,
-                                          minLines: 2,
-                                          expands: false,
-                                          controller: infoName,
-                                          decoration: InputDecoration(
-                                            labelText: "Açıklamayı Girin",
-                                            suffixIcon: IconButton(
-                                              onPressed: () {
-                                                infoName.clear();
-                                              },
-                                              icon: Icon(
-                                                Icons.clear_rounded,
-                                                color: Color.fromRGBO(
-                                                    84, 114, 251, 1),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 5,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(
-                                                left: 60,
-                                                right: 60,
-                                                bottom: 10,
-                                                top: 20),
-                                            child: ElevatedButton(
-                                                onPressed: () {
-                                                  if (userName.text.isEmpty ||
-                                                      infoName.text.isEmpty ||
-                                                      regNum.text.isEmpty) {
-                                                    EasyLoading.showError(
-                                                      'Boş Bıraktınız',
-                                                      duration:
-                                                          Duration(seconds: 1),
-                                                      dismissOnTap: true,
-                                                    );
-                                                  } else {
-                                                    setState(() {
-                                                      addName = userName.text;
-                                                      addInfo = infoName.text;
-                                                      addRegNum = regNum.text;
-                                                      addLog();
-
-                                                      resetCheck();
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              OldRecords(
-                                                                  widget
-                                                                      .selectedMachineID,
-                                                                  categoryId),
-                                                        ),
-                                                      );
-                                                    });
-                                                    userName.clear();
-                                                    infoName.clear();
-                                                    regNum.clear();
-
-                                                    checked = false;
-                                                  }
-                                                },
-                                                child: Text("Kaydet")),
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                          context: context,
+                          builder: (context) {
+                            return AddRecordBottomSheet(
+                                widget.selectedMachineID, categoryId);
+                          },
                         ),
                       ),
                     ),

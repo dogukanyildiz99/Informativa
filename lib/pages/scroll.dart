@@ -48,8 +48,8 @@ class _ScrollState extends State<Scroll> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.9,
-      maxChildSize: 0.95,
+      initialChildSize: 0.8999999999,
+      maxChildSize: 0.9,
       minChildSize: 0.4,
       expand: false,
       builder: ((context, scrollController) => ListView.builder(

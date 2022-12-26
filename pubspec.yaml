@@ -31,6 +31,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -45,8 +47,8 @@ dependencies:
   scrollable_panel: ^0.4.1
   expandable_bottom_bar: ^2.0.2
   modal_bottom_sheet: ^2.1.2
-  google_fonts: ^3.0.1
   excel: ^2.0.0-null-safety-3
+  syncfusion_flutter_datepicker: ^20.3.60
 
 dev_dependencies:
   flutter_test:
@@ -72,7 +74,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/image/
+    - assets/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
